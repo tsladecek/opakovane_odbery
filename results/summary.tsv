@@ -1,0 +1,7 @@
+model	params	train_accuracy	train_sensitivity	train_specificity	train_mcc	validation_accuracy	validation_sensitivity	validation_specificity	validation_mcc
+logisticregression	{'penalty': 'l2', 'solver': 'liblinear', 'C': 0.0001, 'max_iter': 500, 'class_weight': None, 'random_state': 1618, 'n_jobs': 4}	0.6063829787234043	0.0909090909090909	0.963963963963964	0.1149695985707197	0.7	0.1428571428571428	1.0	0.3126409456585232
+lda	{'solver': 'svd'}	0.6808510638297872	0.5454545454545454	0.7747747747747747	0.3288045804670844	0.55	0.4285714285714285	0.6153846153846154	0.0427960492510912
+qda	{'reg_param': 0.2}	0.6861702127659575	0.4805194805194805	0.8288288288288288	0.332639347227985	0.8	0.5714285714285714	0.9230769230769232	0.5447047794019222
+svc	{'C': 1, 'kernel': 'rbf', 'gamma': 'auto', 'random_state': 1618}	1.0	1.0	1.0	1.0	0.775	0.7857142857142857	0.7692307692307693	0.5354418332318489
+randomforest	{'n_estimators': 100, 'max_depth': 8, 'min_samples_leaf': 2, 'max_features': 'sqrt', 'class_weight': 'balanced', 'bootstrap': False, 'random_state': 1618, 'n_jobs': 4}	0.9946808510638298	1.0	0.990990990990991	0.98908340309904	0.775	0.5714285714285714	0.8846153846153846	0.4871492684262215
+xgboost	{'max_depth': 8, 'eta': 1, 'gamma': 0, 'subsample': 0.8, 'lambda': 0.1, 'colsample_bytree': 0.6, 'scale_pos_weight': 1.4415584415584415, 'seed': 1618, 'nthread': 4, 'objective': 'binary:logistic'}	1.0	1.0	1.0	1.0	0.875	0.6428571428571429	1.0	0.7342823073671614
