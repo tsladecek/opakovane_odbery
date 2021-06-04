@@ -6,7 +6,7 @@ Snakemake Input Functions
 
 def all_models(wildcards):
     res = []
-    for m in ["logisticregression", "lda", "qda", "svc", "randomforest", "xgboost", "knn"]:
+    for m in ["logisticregression", "lda", "qda", "svc", "randomforest", "xgboost"]:
         res.append(f"results/models/{m}.json")
         res.append(f"results/gridsearch_results/{m}.tsv")
     
