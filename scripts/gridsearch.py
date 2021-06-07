@@ -73,7 +73,7 @@ def gridsearch(X_train, Y_train, X_val, Y_val, model, params, modelpath=None,
         
         # class imbalance
         ci = np.sum(Y_train == 0) / np.sum(Y_train == 1)
-        params['scale_pos_weight'] = [ci, np.sqrt(ci)]
+        params['scale_pos_weight'] = [ci, np.sqrt(ci), 1]
     
     params = param_list(params)
     

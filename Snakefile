@@ -24,8 +24,8 @@ rule model_gridsearch:
         results    = "results/gridsearch_results/{model}.tsv"
     threads: config["THREADS"]
     run:
-        train = pd.read_csv(input.train, sep='\t', index_col=0)
-        val = pd.read_csv(input.validation, sep='\t', index_col=0)
+        train = pd.read_csv(input.train, sep='\t')
+        val = pd.read_csv(input.validation, sep='\t')
         
         train_X = train.loc[:, ATTRIBUTES]
         train_y = train.binary_2nd_result.values
