@@ -50,7 +50,7 @@ def gridsearch(X_train, Y_train, X_val, Y_val, model, params, modelpath=None,
     """
 
     results = []
-    best_mcc = 0
+    best_mcc = -1
     
     model = model.lower()
     
@@ -61,7 +61,7 @@ def gridsearch(X_train, Y_train, X_val, Y_val, model, params, modelpath=None,
                   "gradientboosting": GradientBoostingClassifier,
                   "adaboost": AdaBoostClassifier,
                   "knn": KNeighborsClassifier}
-    
+
     stochastic = ["svc", "logisticregression", "gradientboosting", "adaboost",
                   "randomforest", "xgboost"]
     
