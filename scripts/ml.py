@@ -49,11 +49,12 @@ reducer = UMAP(n_neighbors=5, min_dist=0.01, random_state=1618)
 
 reducer.fit(train_X_s)
 
+train_umap = reducer.transform(train_X_s)
 val_umap = reducer.transform(val_X_s)
 
 
 sns.scatterplot(x=val_umap[:, 0], y=val_umap[:, 1], hue=val_y)
-
+sns.scatterplot(x=train_umap[:, 0], y=train_umap[:, 1], hue=train_y)
 
 # %%
 sns.scatterplot(x="Gestational age", y="first_ff", data=train_X)
