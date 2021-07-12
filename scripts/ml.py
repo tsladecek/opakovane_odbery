@@ -27,16 +27,26 @@ from scripts.constants import ATTRIBUTES
 from scripts.gridsearch import gridsearch 
 from scripts.model_search_space import model_search_space
 
+from matplotlib import rcParams
+
+
+rcParams.update({"font.size": 15})
+
 # %%
 train = pd.read_csv("data/train.tsv", sep='\t')
 val = pd.read_csv("data/validation.tsv", sep='\t')
-
+test = pd.read_csv("data/test.tsv", sep='\t')
 
 train_X = train.loc[:, ATTRIBUTES]
 train_y = train.binary_2nd_result.values
 
 val_X = val.loc[:, ATTRIBUTES]
 val_y = val.binary_2nd_result.values
+
+test_X = test.loc[:, ATTRIBUTES]
+test_y = test.binary_2nd_result.values
+
+all_X = pd.concat([train, val, test])
 
 # SCALING
 ss = StandardScaler()
@@ -106,8 +116,8 @@ def trymodel(model, params, X, y, X_val, y_val):
 
 # %% Ridge
 ridge_res = []
-for alpha in np.linspace(0, 0.2, 41):
-    t, v, m = trymodel(Ridge(), {"alpha": alpha}, train_X, y_train, val_X, y_val)
+for alpha in np.linspace(62, 68, 41):
+    t, v, m = trymodel(Ridge(), {"alpha": alpha}, train_X_s, y_train, val_X_s, y_val)
     
     ridge_res.append([alpha, t, v])
     
@@ -120,15 +130,52 @@ plt.legend()
 
 
 # %%
-t, v, m = trymodel(Ridge(), {"alpha": 0.1}, train_X, y_train, val_X, y_val)
+fig, ax = plt.subplots(2, 2, figsize=(16, 12))
 
-yhat_train = m.predict(train_X)
-yhat_val = m.predict(val_X)
-plt.plot(y_val, yhat_val, '.k')
-plt.plot(np.linspace(0, 0.1, 10), np.linspace(0, 0.1, 10), '--k', alpha=0.2)
+sns.histplot(all_X.loc[:, "Gestational age"], bins=10, color='lightgrey', ax=ax[0, 0])
+ax[0, 0].set_xlabel("Gestational age (in days)")
+ax[0, 0].set_title("A", loc="left", fontsize=30)
 
-plt.xlim(0.02, 0.1)
-plt.ylim(0.02, 0.1)
+
+sns.lineplot(x = "Gestational age", y = "second_ff", style="binary_2nd_result", 
+             data = all_X, ax=ax[0, 1], color='black')
+ax[0, 1].set_title("B", loc="left", fontsize=30)
+
+sns.regplot(x = "Gestational age", y = "binary_2nd_result", color='black', data=all_X,
+             ax=ax[1, 0], lowess=True)
+ax[1, 0].set_title("C", loc="left", fontsize=30)
+
+t, v, m = trymodel(Ridge(), {"alpha": 64.5}, train_X_s, y_train, val_X_s, y_val)
+
+yhat_train = m.predict(train_X_s)
+yhat_val = m.predict(val_X_s)
+ax[1, 1].plot(y_val, yhat_val, '.k', markersize=20)
+ax[1, 1].plot(np.linspace(0, 0.1, 10), np.linspace(0, 0.1, 10), '--k', alpha=0.2)
+
+ax[1, 1].set_xlim(0.02, 0.1)
+ax[1, 1].set_ylim(0.02, 0.1)
+
+ax[1, 1].set_xlabel('Fetal Fraction after second sampling')
+ax[1, 1].set_ylabel('Predicted Fetal Fraction after second sampling')
+
+ax[1, 1].set_title("D", loc="left", fontsize=30)
+
+plt.tight_layout()
+
+plt.savefig('plots/4plots.png', dpi=200)
+
+# %%
+fig, ax = plt.subplots(figsize=(9, 7))
+
+t, v, m = trymodel(Ridge(), {"alpha": 64.5}, train_X_s, y_train, val_X_s, y_val)
+
+yhat_train = m.predict(train_X_s)
+yhat_val = m.predict(val_X_s)
+ax.plot(y_val, yhat_val, '.k', markersize=20)
+ax.plot(np.linspace(0, 0.1, 10), np.linspace(0, 0.1, 10), '--k', alpha=0.2)
+
+ax.set_xlim(0.02, 0.1)
+ax.set_ylim(0.02, 0.1)
 
 def baseline_model(n):
     return np.repeat(np.mean(y_train), n)
@@ -136,11 +183,15 @@ def baseline_model(n):
 baseline_val = np.sqrt(mean_squared_error(y_val, baseline_model(len(y_val))))  # np.sqrt(np.mean((y_val - np.mean(y_train)) ** 2))
 baseline_train = np.sqrt(mean_squared_error(y_train, baseline_model(len(y_train))))  # np.sqrt(np.mean((y_train - np.mean(y_train)) ** 2))
 
-plt.title('Validation Performance - Ridge\
-          \nTrain RMSE: {:.3f}, Validation RMSE: {:.3f}\
-          \nBaseline Train RMSE: {:.3f}, Baseline Val RMSE: {:.3f}'.format(t, v, baseline_train, baseline_val))
-plt.xlabel('Real Second FF')
-plt.ylabel('Predicted Second FF')
+# plt.title('Validation Performance - Ridge\
+#           \nTrain RMSE: {:.3f}, Validation RMSE: {:.3f}\
+#           \nBaseline Train RMSE: {:.3f}, Baseline Val RMSE: {:.3f}'.format(t, v, baseline_train, baseline_val))
+# ax.set_title('Train RMSE: {:.3f}, Validation RMSE: {:.3f}'.format(t, v))
+
+ax.set_xlabel('Fetal Fraction after second sampling')
+ax.set_ylabel('Predicted Fetal Fraction after second sampling')
+
+plt.tight_layout()
 
 plt.savefig('plots/ridge.png', dpi=100)
 

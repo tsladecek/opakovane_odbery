@@ -1,2 +1,0 @@
-	params	train_accuracy	train_sensitivity	train_specificity	train_mcc	validation_accuracy	validation_sensitivity	validation_specificity	validation_mcc
-0	{'solver': 'svd'}	0.7218543046357616	0.8705882352941177	0.5303030303030303	0.4320504476352969	0.59375	0.7	0.4166666666666667	0.11891767800211263
