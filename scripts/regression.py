@@ -17,11 +17,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from sklearn.linear_model import LogisticRegression, LinearRegression, Ridge
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.linear_model import Ridge
 from sklearn.svm import SVC, SVR
 from sklearn.preprocessing import PolynomialFeatures
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, r2_score
 
 from sklearn.preprocessing import StandardScaler
 import xgboost as xgb
@@ -29,8 +28,6 @@ from xgboost import XGBRegressor
 
 from scripts.constants import ATTRIBUTES
 
-from scripts.gridsearch import gridsearch 
-from scripts.model_search_space import model_search_space
 
 from matplotlib import rcParams
 
@@ -99,17 +96,17 @@ def trymodel(model, params, X, y, X_val, y_val):
 
 
 # %% Ridge
-# ridge_res = []
-# for alpha in np.linspace(20, 80, 41):
-#     t, v, m = trymodel(Ridge(), {"alpha": alpha}, train_X_s, y_train, val_X_s, y_val)
+ridge_res = []
+for alpha in np.linspace(20, 80, 41):
+    t, v, m = trymodel(Ridge(), {"alpha": alpha}, train_X_s, y_train, val_X_s, y_val)
     
-#     ridge_res.append([alpha, t, v])
+    ridge_res.append([alpha, t, v])
     
-# ridge_res = np.array(ridge_res)
+ridge_res = np.array(ridge_res)
 
-# plt.plot(ridge_res[:, 0], ridge_res[:, 1], '.', label='train')
-# plt.plot(ridge_res[:, 0], ridge_res[:, 2], '.', label='validation')
-# plt.legend()
+plt.plot(ridge_res[:, 0], ridge_res[:, 1], '.', label='train')
+plt.plot(ridge_res[:, 0], ridge_res[:, 2], '.', label='validation')
+plt.legend()
 
 
 # %%
@@ -136,12 +133,17 @@ t, v, m = trymodel(Ridge(), {"alpha": ALPHA}, train_X_s, y_train, val_X_s, y_val
 yhat_test = m.predict(test_X_s)
 ax[1, 1].plot(y_test, yhat_test, '.k', markersize=20)
 ax[1, 1].plot(np.linspace(0, 0.13, 10), np.linspace(0, 0.13, 10), '--k', alpha=0.2)
+sns.regplot(x=y_test, y=yhat_test, color='gray', ax=ax[1, 1])
+
 
 ax[1, 1].set_xlim(0.02, 0.13)
 ax[1, 1].set_ylim(0.02, 0.13)
 
 ax[1, 1].set_xlabel('Fetal Fraction after second sampling')
 ax[1, 1].set_ylabel('Predicted Fetal Fraction after second sampling')
+
+r2 = np.round(r2_score(y_test, yhat_test), 3)
+ax[1, 1].text(0.023, 0.12, f'R-squared = {r2}', bbox={'pad': 10, 'facecolor': 'white'})
 
 ax[1, 1].set_title("D", loc="left", fontsize=30)
 
@@ -158,8 +160,12 @@ t, te, m = trymodel(Ridge(), {"alpha": ALPHA}, train_X_s, y_train, test_X_s, y_t
 
 yhat_train = m.predict(train_X_s)
 yhat_val = m.predict(val_X_s)
+yhat_test = m.predict(test_X_s)
+
 ax.plot(y_test, yhat_test, '.k', markersize=20)
 ax.plot(np.linspace(0, 0.13, 10), np.linspace(0, 0.13, 10), '--k', alpha=0.2)
+
+sns.regplot(x=y_test, y=yhat_test, color='gray')
 
 ax.set_xlim(0.02, 0.13)
 ax.set_ylim(0.02, 0.13)
@@ -179,6 +185,10 @@ plt.title('Ridge (Test Data)\
 
 ax.set_xlabel('Fetal Fraction after second sampling')
 ax.set_ylabel('Predicted Fetal Fraction after second sampling')
+
+r2 = np.round(r2_score(y_test, yhat_test), 3)
+
+ax.text(0.023, 0.12, f'R-squared = {r2}', bbox={'pad': 10, 'facecolor': 'white'})
 
 plt.tight_layout()
 
