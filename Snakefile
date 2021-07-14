@@ -8,12 +8,36 @@ from scripts.gridsearch import gridsearch
 from scripts.model_search_space import model_search_space
 from scripts.constants import ATTRIBUTES
 
-
-rule all_models:
+rule all:
     input:
-        all_models
+        summary = "results/summary.tsv"
 
 
+
+rule summary_table:
+    input:
+        logisticregression = "results/gridsearch_results/logisticregression.tsv",
+        lda = "results/gridsearch_results/lda.tsv",
+        qda = "results/gridsearch_results/qda.tsv",
+        svc = "results/gridsearch_results/svc.tsv",
+        randomforest = "results/gridsearch_results/randomforest.tsv",
+        xgboost = "results/models/xgboost_final.json",
+        train      = "data/train.tsv",
+        validation = "data/validation.tsv"
+    output:
+        summary = "results/summary.tsv"
+    script:
+        "scripts/results_evaluation.py"
+
+
+rule remodel:
+    input:
+        train      = "data/train.tsv",
+        validation = "data/validation.tsv"
+    output:
+        xgb_final = "results/models/xgboost_final.json"
+    script:
+        "scripts/remodel.py"
 
 rule model_gridsearch:
     input:
@@ -39,7 +63,7 @@ rule model_gridsearch:
         val_X_s = ss.transform(val_X)
        
         # GRIDSEARCH 
-        gridsearch(train_X, train_y, val_X, val_y, model=wildcards.model,
+        gridsearch(train_X_s, train_y, val_X_s, val_y, model=wildcards.model,
                    params=model_search_space[wildcards.model],
                    modelpath=output.modelpath, resultspath=output.results,
                    n_jobs=threads)
