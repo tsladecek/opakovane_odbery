@@ -10,9 +10,20 @@ from scripts.constants import ATTRIBUTES
 
 rule all:
     input:
-        summary = "results/summary.tsv"
+        summary = "results/summary.tsv",
+        fourplots = "plots/4plots.png",
+        ridge = "plots/ridge.png"
 
-
+rule regression:
+    input:
+        train      = "data/train.tsv",
+        validation = "data/validation.tsv",
+        test       = "data/test.tsv"
+    output:
+        fourplots = "plots/4plots.png",
+        ridge = "plots/ridge.png"
+    script:
+        "scripts/regression.py"
 
 rule summary_table:
     input:

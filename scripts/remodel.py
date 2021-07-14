@@ -12,6 +12,7 @@ ind = filepath_list.index('scripts')
 
 sys.path.insert(1, '/'.join(filepath_list[:ind]))
 # %%
+import numpy as np
 import pandas as pd
 import xgboost
 from sklearn.preprocessing import StandardScaler
@@ -44,6 +45,7 @@ val_dmat = xgboost.DMatrix(val_X_s, val_y)
 # %%
 m = xgboost.train(p, train_dmat, num_boost_round=100, early_stopping_rounds=15,
                   evals=[(train_dmat, 'train'), (val_dmat, 'validation')], verbose_eval=0)
+
 
 # %%
 m.save_model(snakemake.output.xgb_final)
