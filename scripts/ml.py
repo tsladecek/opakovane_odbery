@@ -116,7 +116,7 @@ def trymodel(model, params, X, y, X_val, y_val):
 
 # %% Ridge
 ridge_res = []
-for alpha in np.linspace(62, 68, 41):
+for alpha in np.linspace(20, 80, 41):
     t, v, m = trymodel(Ridge(), {"alpha": alpha}, train_X_s, y_train, val_X_s, y_val)
     
     ridge_res.append([alpha, t, v])
@@ -128,6 +128,8 @@ plt.plot(ridge_res[:, 0], ridge_res[:, 2], '.', label='validation')
 plt.legend()
 
 
+# %%
+ALPHA = 50
 
 # %%
 fig, ax = plt.subplots(2, 2, figsize=(16, 12))
@@ -145,7 +147,7 @@ sns.regplot(x = "Gestational age", y = "binary_2nd_result", color='black', data=
              ax=ax[1, 0], lowess=True)
 ax[1, 0].set_title("C", loc="left", fontsize=30)
 
-t, v, m = trymodel(Ridge(), {"alpha": 64.5}, train_X_s, y_train, val_X_s, y_val)
+t, v, m = trymodel(Ridge(), {"alpha": ALPHA}, train_X_s, y_train, val_X_s, y_val)
 
 yhat_train = m.predict(train_X_s)
 yhat_val = m.predict(val_X_s)
@@ -167,7 +169,7 @@ plt.savefig('plots/4plots.png', dpi=200)
 # %%
 fig, ax = plt.subplots(figsize=(9, 7))
 
-t, v, m = trymodel(Ridge(), {"alpha": 64.5}, train_X_s, y_train, val_X_s, y_val)
+t, v, m = trymodel(Ridge(), {"alpha": ALPHA}, train_X_s, y_train, val_X_s, y_val)
 
 yhat_train = m.predict(train_X_s)
 yhat_val = m.predict(val_X_s)
