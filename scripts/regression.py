@@ -32,7 +32,7 @@ from scripts.constants import ATTRIBUTES
 from matplotlib import rcParams
 
 
-rcParams.update({"font.size": 15})
+rcParams.update({"font.size": 12})
 
 # %%
 # train = pd.read_csv("data/train.tsv", sep='\t')
@@ -153,7 +153,7 @@ plt.savefig(snakemake.output.fourplots, dpi=200)
 # plt.savefig('plots/4plots.png', dpi=200)
 
 # %%
-fig, ax = plt.subplots(figsize=(9, 7))
+fig, ax = plt.subplots(figsize=(7, 6))
 
 t, v, m = trymodel(Ridge(), {"alpha": ALPHA}, train_X_s, y_train, val_X_s, y_val)
 t, te, m = trymodel(Ridge(), {"alpha": ALPHA}, train_X_s, y_train, test_X_s, y_test)
@@ -177,10 +177,10 @@ baseline_val = np.sqrt(mean_squared_error(y_val, baseline_model(len(y_val))))  #
 baseline_train = np.sqrt(mean_squared_error(y_train, baseline_model(len(y_train))))  # np.sqrt(np.mean((y_train - np.mean(y_train)) ** 2))
 baseline_test = np.sqrt(mean_squared_error(y_test, baseline_model(len(y_test))))
 
-plt.title('Ridge (Test Data)\
-          \nRMSE - Train: {:.3f}, Validation: {:.3f}, Test: {:.3f}\
-          \nBaseline RMSE - Train: {:.3f}, Validation: {:.3f}, Test: {:.3f}'\
-              .format(t, v, te, baseline_train, baseline_val, baseline_test))
+# plt.title('Ridge (Test Data)\
+#           \nRMSE - Train: {:.3f}, Validation: {:.3f}, Test: {:.3f}\
+#           \nBaseline RMSE - Train: {:.3f}, Validation: {:.3f}, Test: {:.3f}'\
+#               .format(t, v, te, baseline_train, baseline_val, baseline_test))
 # ax.set_title('Train RMSE: {:.3f}, Validation RMSE: {:.3f}'.format(t, v))
 
 ax.set_xlabel('Fetal Fraction after second sampling')
