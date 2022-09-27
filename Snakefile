@@ -12,7 +12,8 @@ rule all:
     input:
         summary = "results/summary.tsv",
         fourplots = "plots/4plots.png",
-        ridge = "plots/ridge.png"
+        ridge = "plots/ridge.png",
+        loocv = "results/loocv.tsv"
 
 rule regression:
     input:
@@ -40,6 +41,15 @@ rule summary_table:
     script:
         "scripts/results_evaluation.py"
 
+rule loocv:
+    input:
+        train      = "data/train.tsv",
+        validation = "data/validation.tsv",
+        test       = "data/test.tsv"
+    output:
+        loocv      = "results/loocv.tsv"
+    script:
+        "scripts/loocv.py"
 
 rule remodel:
     input:
