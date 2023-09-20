@@ -1,3 +1,4 @@
 *pycache*
 .snakemake 
 just_plots*
+.idea
