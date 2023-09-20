@@ -155,8 +155,24 @@ plt.savefig(snakemake.output.fourplots, dpi=200)
 # %%
 fig, ax = plt.subplots(figsize=(7, 6))
 
-t, v, m = trymodel(Ridge(), {"alpha": ALPHA}, train_X_s, y_train, val_X_s, y_val)
-t, te, m = trymodel(Ridge(), {"alpha": ALPHA}, train_X_s, y_train, test_X_s, y_test)
+train_rmse0, validation_rmse, m = trymodel(Ridge(), {"alpha": ALPHA}, train_X_s, y_train, val_X_s, y_val)
+train_rmse, test_rmse, m = trymodel(Ridge(), {"alpha": ALPHA}, train_X_s, y_train, test_X_s, y_test)
+
+def baseline_model(n):
+    return np.repeat(np.mean(y_train), n)
+
+baseline_val = np.sqrt(mean_squared_error(y_val, baseline_model(len(y_val))))
+baseline_train = np.sqrt(mean_squared_error(y_train, baseline_model(len(y_train))))
+baseline_test = np.sqrt(mean_squared_error(y_test, baseline_model(len(y_test))))
+
+with open(snakemake.output.rmse, 'w') as f:
+    f.write(f'Train RMSE: {train_rmse0}\n')
+    f.write(f'Validation RMSE: {validation_rmse}\n')
+    f.write(f'Test RMSE: {test_rmse}\n')
+    f.write(f'Baseline Train RMSE: {baseline_train}\n')
+    f.write(f'Baseline Validation RMSE: {baseline_val}\n')
+    f.write(f'Baseline Test RMSE: {baseline_test}\n')
+
 
 yhat_train = m.predict(train_X_s)
 yhat_val = m.predict(val_X_s)
@@ -169,13 +185,6 @@ sns.regplot(x=y_test, y=yhat_test, color='gray')
 
 ax.set_xlim(0.02, 0.13)
 ax.set_ylim(0.02, 0.13)
-
-def baseline_model(n):
-    return np.repeat(np.mean(y_train), n)
-
-baseline_val = np.sqrt(mean_squared_error(y_val, baseline_model(len(y_val))))  # np.sqrt(np.mean((y_val - np.mean(y_train)) ** 2))
-baseline_train = np.sqrt(mean_squared_error(y_train, baseline_model(len(y_train))))  # np.sqrt(np.mean((y_train - np.mean(y_train)) ** 2))
-baseline_test = np.sqrt(mean_squared_error(y_test, baseline_model(len(y_test))))
 
 # plt.title('Ridge (Test Data)\
 #           \nRMSE - Train: {:.3f}, Validation: {:.3f}, Test: {:.3f}\

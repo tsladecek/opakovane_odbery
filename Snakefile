@@ -13,6 +13,7 @@ rule all:
         summary = "results/summary.tsv",
         fourplots = "plots/4plots.png",
         ridge = "plots/ridge.png",
+        rmse = "results/ridge_rmse.txt",
         loocv = "results/loocv.tsv",
         poly_train_val = 'results/poly_train_val.tsv',
         poly_test ='results/poly_test.tsv',
@@ -41,7 +42,8 @@ rule regression:
         test       = "data/test.tsv"
     output:
         fourplots = "plots/4plots.png",
-        ridge = "plots/ridge.png"
+        ridge = "plots/ridge.png",
+        rmse = "results/ridge_rmse.txt"
     script:
         "scripts/regression.py"
 
