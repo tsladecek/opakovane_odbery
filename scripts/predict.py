@@ -37,16 +37,18 @@ def predict(df, train_data="data/train.tsv", val_data="data/validation.tsv",
     return yhat
 
 # %%
-import numpy as np
-from sklearn.metrics import confusion_matrix
+if __name__ == "__main__":
+    import numpy as np
+    from sklearn.metrics import confusion_matrix
 
-test = pd.read_csv("data/test.tsv", sep='\t')
+    test = pd.read_csv("data/test.tsv", sep='\t')
 
-yhat_test = predict(test)
+    yhat_test = predict(test)
 
-(TN, FP), (FN, TP) = confusion_matrix(test.binary_2nd_result.values, yhat_test)
-test_acc = (TN + TP) / (TN + TP + FP + FN)  # == 58.6 %
-test_sens = TP / (TP + FN)  # 68.75 %
-test_spec = TN / (TN + FP)  # 49.15 %
-test_mcc = (TP * TN - FP * FN) / np.sqrt((TP + FP) * (TP + FN) * (TN + FP) * (TN + FN)) # 0.1447
+    (TN, FP), (FN, TP) = confusion_matrix(test.binary_2nd_result.values, yhat_test)
+    test_acc = (TN + TP) / (TN + TP + FP + FN)  # == 58.6 %x
+    test_sens = TP / (TP + FN)  # 68.75 %
+    test_spec = TN / (TN + FP)  # 49.15 %
+    test_mcc = (TP * TN - FP * FN) / np.sqrt((TP + FP) * (TP + FN) * (TN + FP) * (TN + FN)) # 0.1447
 
+    print(test_acc, test_sens, test_spec, test_mcc)

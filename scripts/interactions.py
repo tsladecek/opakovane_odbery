@@ -1,10 +1,10 @@
 """
 Test if adding interaction terms will help with the prediction accuracy
 """
+import pathlib
 # %%
 # read train and validation set
 import sys
-import pathlib
 
 # add root path to sys path. Necessary if we want to keep doing package like imports
 
@@ -17,7 +17,6 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from sklearn.metrics import confusion_matrix
-from scripts.gridsearch import gridsearch
 from scripts.constants import ATTRIBUTES
 import xgboost
 import shap
@@ -26,9 +25,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # %%
-train = pd.read_csv('data/train.tsv', sep='\t')
-val = pd.read_csv('data/validation.tsv', sep='\t')
-test = pd.read_csv('data/test.tsv', sep='\t')
+# train = pd.read_csv('data/train.tsv', sep='\t')
+# val = pd.read_csv('data/validation.tsv', sep='\t')
+# test = pd.read_csv('data/test.tsv', sep='\t')
+
+train = pd.read_csv(snakemake.input.train, sep='\t')
+val = pd.read_csv(snakemake.input.validation, sep='\t')
+test = pd.read_csv(snakemake.input.test, sep='\t')
 
 train_X = train.loc[:, ATTRIBUTES]
 train_y = train.binary_2nd_result.values
@@ -38,10 +41,6 @@ val_y = val.binary_2nd_result.values
 
 test_X = test.loc[:, ATTRIBUTES]
 test_y = test.binary_2nd_result.values
-
-# train = pd.read_csv(snakemake.input.train, sep='\t')
-# val = pd.read_csv(snakemake.input.validation, sep='\t')
-# test = pd.read_csv(snakemake.input.test, sep='\t')
 
 # %% Scale
 ss = StandardScaler()
@@ -63,8 +62,8 @@ test_dmat = xgboost.DMatrix(test_X_scaled_poly, test_y)
 # %% POLY Attributes
 
 # %% train model
-p={'max_depth': 8, 'eta': 0.1, 'gamma': 1, 'subsample': 0.2, 'lambda': 0.1, 
-     'colsample_bytree': 0.6, 'scale_pos_weight': 0.6097560975609756, 'seed': 1618, 
+p = {'max_depth': 8, 'eta': 0.1, 'gamma': 1, 'subsample': 0.2, 'lambda': 0.1,
+     'colsample_bytree': 0.6, 'scale_pos_weight': 0.6097560975609756, 'seed': 1618,
      'nthread': 4, 'objective': 'binary:logistic'}
 
 m = xgboost.train(p, train_dmat, num_boost_round=100, early_stopping_rounds=15,
@@ -83,9 +82,9 @@ metrics = pd.DataFrame({
     'sensitivity': [sens],
     'spec': [spec],
     'mcc': [mcc]
-    })
+})
 
-print(metrics)
+metrics.to_csv(snakemake.output.poly_train_val, sep='\t', index=False)
 
 # %% predict test
 y_hat_test = np.round(m.predict(test_dmat))
@@ -100,16 +99,19 @@ metrics = pd.DataFrame({
     'sensitivity': [sens],
     'spec': [spec],
     'mcc': [mcc]
-    })
+})
 
-print(metrics)
+metrics.to_csv(snakemake.output.poly_test, sep='\t', index=False)
 
 # %% SHAP
 explainer = shap.TreeExplainer(m)
 shap_values = explainer.shap_values(test_dmat)
 
-shap_values_df = pd.DataFrame(shap_values, columns=poly.get_feature_names(input_features=[i.replace(' ', '_') for i in ATTRIBUTES]), dtype=float)
-shap_values_df.to_csv('results/test_interactions_shap_values.tsv', sep='\t')
+shap_values_df = pd.DataFrame(shap_values,
+                              columns=poly.get_feature_names_out(input_features=[i.replace(' ', '_') for i in ATTRIBUTES]),
+                              dtype=float)
+# shap_values_df.to_csv('results/test_interactions_shap_values.tsv', sep='\t')
+shap_values_df.to_csv(snakemake.output.shap, sep='\t')
 
 # %% Transform shap values to probability space
 
@@ -124,15 +126,12 @@ shap_values_summary = pd.DataFrame({
     'abs_std': abs_std_shap_values
 })
 
-shap_values_df.to_csv('results/test_interactions_shap_values_summary.tsv', sep='\t')
+# shap_values_df.to_csv('results/test_interactions_shap_values_summary.tsv', sep='\t')
+shap_values_df.to_csv(snakemake.output.shap_summary, sep='\t')
 
 # %%
 melted = shap_values_df.melt(var_name='attribute', value_name='shap_value')
 melted['abs_shap_values'] = np.abs(melted.shap_value)
-
-# %%
-
-
 
 # %%
 fig, ax = plt.subplots(figsize=(8, 6), dpi=250)
@@ -141,9 +140,9 @@ sns.set_theme(style='ticks', rc={"axes.spines.right": False, "axes.spines.top": 
 # sns.barplot(data=shap_values_summary.sort_values('abs_mean', ascending=False), x="abs_mean", y="attribute", ax=ax, color='grey')
 sns.barplot(data=melted, x="abs_shap_values", y="attribute", estimator=np.mean, ax=ax, color='grey')
 
-
 ax.set_ylabel('')
 ax.set_xlabel('Mean of Absolute values of SHAP values')
 
 fig.tight_layout()
-fig.savefig('plots/shap_values_test_interactions.png')
+# fig.savefig('plots/shap_values_test_interactions.png')
+fig.savefig(snakemake.output.shap_plot)

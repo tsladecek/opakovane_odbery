@@ -13,7 +13,26 @@ rule all:
         summary = "results/summary.tsv",
         fourplots = "plots/4plots.png",
         ridge = "plots/ridge.png",
-        loocv = "results/loocv.tsv"
+        loocv = "results/loocv.tsv",
+        poly_train_val = 'results/poly_train_val.tsv',
+        poly_test ='results/poly_test.tsv',
+        shap = 'results/test_interactions_shap_values.tsv',
+        shap_summary = 'results/test_interactions_shap_values_summary.tsv',
+        shap_plot = 'plots/shap_values_test_interactions.png'
+
+rule shap:
+    input:
+        train = "data/train.tsv",
+        validation = "data/validation.tsv",
+        test = "data/test.tsv"
+    output:
+        poly_train_val = 'results/poly_train_val.tsv',
+        poly_test = 'results/poly_test.tsv',
+        shap = 'results/test_interactions_shap_values.tsv',
+        shap_summary = 'results/test_interactions_shap_values_summary.tsv',
+        shap_plot = 'plots/shap_values_test_interactions.png'
+    script:
+        "scripts/interactions.py"
 
 rule regression:
     input:

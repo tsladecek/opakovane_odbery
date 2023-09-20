@@ -68,6 +68,3 @@ shap.force_plot(sv[0])
 
 # %%
 shap.plots.waterfall(sv[5])
-
-# %%
-# Ahojte, tak len rychly update. Mam sa ist teraz stretnut s jednou profesorkou tu, takze neviem ci to stiham. Prva vec co som si uvedomil a je to celkom podstatne je, ze xgboost nevracia pravdepodobnosti. Je to v podstate nieco ako hlasovacia schema. Hodnoty predikcii teda nebudu rovnomerne rozdelene na intervale od 0 do 1 ale bude par bodov kde sa budu zhlukovat, podobne ako pri SVC. Zistil som taktiez ze SHAP sa da pouzit pre hocijaky model, cize tam limitovani nie sme.
